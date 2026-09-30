@@ -37,6 +37,7 @@
 #include "../builtins/md1.c"
 #include "../builtins/md2.c"
 #include "../builtins/internal.c"
+#include "../builtins/debugger.c"
 #include "../builtins/inverse.c"
 #include "../builtins/squeeze.c"
 #include "../builtins/compare.c"

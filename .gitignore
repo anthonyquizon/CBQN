@@ -40,6 +40,7 @@ cbqn-jit.bqn
 # other
 /local/
 perf.data*
+.tags
 
 # clangd / compile commands
 compile_commands.json
@@ -51,4 +52,3 @@ compile_commands.json
 /obj/
 /src/gen/
 
-tags

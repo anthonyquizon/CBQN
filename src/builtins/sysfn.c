@@ -1397,6 +1397,7 @@ B getNsNS(void) {
 }
 
 B getInternalNS(void);
+B getDebuggerNS(void);
 B getMathNS(void);
 B getBitNS(void);
 B getSysFFI(B path, bool namespace);
@@ -1470,6 +1471,7 @@ STATIC_GLOBAL Body* file_nsGen;
   F(1, platform, U"•platform") \
   F(1, bqn, U"•BQN") \
   F(1, rebqn, U"•ReBQN") \
+  F(1, debug, U"•debug") \
   OPTIONAL_VAL(DEBUG)(F(0, testsysval1, U"•TestSysval1")) // end of FOR_COMPUTED_SYSVALS
 
 enum ComputedSys {
@@ -1674,6 +1676,7 @@ B sys_c1(B t, B x) {
         else                    cr = incG(CACHE_OBJ(rebqn, m_nfn(rebqnDesc, ref)));
         break;
       }
+      case sys_debug: cr = getDebuggerNS(); break;
       default: {
         u32 cu = sys_id(c) - sys_undefStart;
         if (cu >= sys_COUNT) thrM("Bad dynamically-loaded system value");
@@ -1718,6 +1721,7 @@ INIT_GLOBAL u32* const dsv_text[] = {
   
   U"•rand.Deal",U"•rand.Range",U"•rand.Subset",
   U"•term.CharB",U"•term.CharN",U"•term.ErrRaw",U"•term.Flush",U"•term.OutRaw",U"•term.RawMode",
+  U"•debug.ReadLine",
   NULL
 };
 
