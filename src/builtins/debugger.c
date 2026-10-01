@@ -4,9 +4,11 @@
 #include "core/ns.h"
 
 const char* repl_readline(void); // from main.c
+STATIC_GLOBAL B dbg_handler;
+STATIC_GLOBAL B dbg_x;
 
 static void dbg_onPause(void) {
-  printf("debugger on throw!\n");
+  c1(dbg_handler, dbg_x);
 }
 
 B readline_c1(B t, B x) {
@@ -19,9 +21,15 @@ B dbqn_c1(B t, B x) {
   return x;
 }
 
-B onpause_c1(Md1D* d, B x) { //B f = d->f;
+B onpause_c1(Md1D* d, B x) { 
+  dec(dbg_handler);
+  dec(dbg_x);
+
+  inc(d->f); inc(x);
   vm_onThrow=dbg_onPause;
-  /*dec(c1(f, x));*/
+  dbg_handler=d->f;
+  dbg_x=x;
+
   return x;
 }
 
@@ -31,6 +39,8 @@ B onpause_c1(Md1D* d, B x) { //B f = d->f;
 STATIC_GLOBAL B debuggerNS;
 B getDebuggerNS(void) {
   if (debuggerNS.u == 0) {
+    gc_add_ref(&dbg_handler);
+    gc_add_ref(&dbg_x);
     #define F(X) incG(bi_##X),
     Body* d    = m_nnsDesc("readline", "bqn", "onpause");
     debuggerNS = m_nns(d, F(readline)F(dbqn)F(onpause));
