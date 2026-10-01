@@ -28,6 +28,7 @@
                   F(SETNi)F(SETUi)F(SETMi)F(SETCi)F(SETNv)F(SETUv)F(SETMv)F(SETCv)F(PRED1)F(PRED2)F(SETH1)F(SETH2) \
                   F(DFND0)F(DFND1)F(DFND2)F(FAIL)
 
+GLOBAL void (*vm_onThrow)(void) = NULL;
 
 char* bc_repr(u32 p) {
   switch(p) { default: return "(unknown)";
@@ -1771,6 +1772,7 @@ NOINLINE NORETURN void throwImpl(bool rethrow) {
   run_pressure();
   
   if (!rethrow) envPrevHeight = envCurr-envStart + 1;
+  if (!rethrow && vm_onThrow) vm_onThrow(); 
 #if USE_SETJMP
   if (cf>cfStart) { // something wants to catch errors
     cf--;

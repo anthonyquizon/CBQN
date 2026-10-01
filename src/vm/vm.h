@@ -88,6 +88,8 @@ typedef struct Body Body;
 typedef struct Scope Scope;
 typedef struct ScopeExt ScopeExt;
 
+extern GLOBAL void (*vm_onThrow)(void);
+
 enum {
   COMP_UNK,
   COMP_REPL,

@@ -29,7 +29,7 @@
 /*  arithm.c*/M(cbrt,"•math.Cbrt") M(log2,"•math.Log2") M(log10,"•math.Log10") M(log1p,"•math.Log1p") M(expm1,"•math.Expm1") M(fact,"•math.Fact") M(logfact,"•math.LogFact") \
 /*  arithm.c*/M(erf,"•math.Erf") M(erfc,"•math.ErfC") M(sum,"•math.Sum") \
 /*     ffi.c*/M(foreignSizeof,"•foreign.Sizeof") A(foreignReadCharsTo0,"•foreign.ReadCharsTo0") A(foreignReadBytesTo0,"•foreign.ReadBytesTo0") \
-/*debugger.c*/M(readline,"•debug.ReadLine")
+/*debugger.c*/M(readline,"•debug.ReadLine") M(dbqn,"•debug.BQN") 
 
 #define FOR_PM1(A,M,D) \
 /*    md1.c*/A(tbl,"⌜") A(each,"¨") A(fold,"´") A(scan,"`") A(const,"˙") A(swap,"˜") A(cell,"˘") A(insert,"˝") \
@@ -37,7 +37,8 @@
 /* everything before the definition of •_timed is defined to be pure, and everything after is not */ \
 /*    md1.c*/A(timed,"•_timed") \
 /*  sysfn.c*/A(invalidMd1, "(invalid 1-modifier)") M(bitcast,"•bit._cast") M(bitnot,"•bit._not") M(bitneg,"•bit._neg") \
-/*  sysfn.c*/D(bitand,"•bit._and") D(bitor,"•bit._or") D(bitxor,"•bit._xor") D(bitadd,"•bit._add") D(bitsub,"•bit._sub") D(bitmul,"•bit._mul")
+/*  sysfn.c*/D(bitand,"•bit._and") D(bitor,"•bit._or") D(bitxor,"•bit._xor") D(bitadd,"•bit._add") D(bitsub,"•bit._sub") D(bitmul,"•bit._mul") \
+/*debugger.c*/M(onpause,"•debug._onPause")
 
 #define FOR_PM2(A,M,D) \
   /*md2.c*/A(val,"⊘") A(repeat,"⍟") A(rank,"⎉") A(depth,"⚇") A(fillBy,"•_fillBy_") A(catch,"⎊") \
