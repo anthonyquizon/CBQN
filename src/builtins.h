@@ -37,8 +37,7 @@
 /* everything before the definition of •_timed is defined to be pure, and everything after is not */ \
 /*    md1.c*/A(timed,"•_timed") \
 /*  sysfn.c*/A(invalidMd1, "(invalid 1-modifier)") M(bitcast,"•bit._cast") M(bitnot,"•bit._not") M(bitneg,"•bit._neg") \
-/*  sysfn.c*/D(bitand,"•bit._and") D(bitor,"•bit._or") D(bitxor,"•bit._xor") D(bitadd,"•bit._add") D(bitsub,"•bit._sub") D(bitmul,"•bit._mul") \
-/*debugger.c*/M(onpause,"•debug._onPause")
+/*  sysfn.c*/D(bitand,"•bit._and") D(bitor,"•bit._or") D(bitxor,"•bit._xor") D(bitadd,"•bit._add") D(bitsub,"•bit._sub") D(bitmul,"•bit._mul") 
 
 #define FOR_PM2(A,M,D) \
   /*md2.c*/A(val,"⊘") A(repeat,"⍟") A(rank,"⎉") A(depth,"⚇") A(fillBy,"•_fillBy_") A(catch,"⎊") \
@@ -46,7 +45,8 @@
   /*md2.c*/M(beforeConst, "•_beforeConst_") \
 /* everything before the definition of •_while_ is defined to be pure, and everything after is not */ \
   /*md2.c*/A(while,"•_while_") \
-/*sysfn.c*/A(invalidMd2, "(invalid 2-modifier)")
+/*sysfn.c*/A(invalidMd2, "(invalid 2-modifier)") \
+/*debugger.c*/A(trap,"•debug._trap_")
 
 enum PrimNumbers {
     /* +-×÷⋆√⌊⌈|¬  */ n_add     , n_sub    , n_mul   , n_div  , n_pow    , n_root     , n_floor , n_ceil , n_stile  , n_not,

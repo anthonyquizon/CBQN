@@ -1116,13 +1116,15 @@ void run_x_arg(char* key, ux keyn, const char* val) { // also called by •inter
   }
 }
 
-//TODO add USE_REPLXX flags and fallback
 const char* repl_readline(void) { // called by •debug.readline
   repl_init();
-  repl_initReplxx(true);
-  const char* ln = cbqn_replxx_input("   ");
-  if (ln && *ln) replxx_history_add(replxx_global, ln);
-  return ln;
+  #if USE_REPLXX
+    repl_initReplxx(true);
+    const char* ln = cbqn_replxx_input("   ");
+    if (ln && *ln) replxx_history_add(replxx_global, ln);
+    return ln;
+  #endif
+  return NULL;
 }
 
 #if EMCC

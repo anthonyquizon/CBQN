@@ -5,10 +5,10 @@
 
 const char* repl_readline(void); // from main.c
 STATIC_GLOBAL B dbg_handler;
-STATIC_GLOBAL B dbg_x;
 
-static void dbg_onPause(void) {
-  c1(dbg_handler, dbg_x);
+static void dbg_onThrow(void) {
+  B msg = thrownMsg;
+  c1(dbg_handler, msg);
 }
 
 B readline_c1(B t, B x) {
@@ -21,16 +21,18 @@ B dbqn_c1(B t, B x) {
   return x;
 }
 
-B onpause_c1(Md1D* d, B x) { 
+B trap_c1(Md2D* d, B x) { 
   dec(dbg_handler);
-  dec(dbg_x);
+  dbg_handler=inc(d->g);
+  vm_onThrow=dbg_onThrow;
+  return c1(d->f,x);
+}
 
-  inc(d->f); inc(x);
-  vm_onThrow=dbg_onPause;
-  dbg_handler=d->f;
-  dbg_x=x;
-
-  return x;
+B trap_c2(Md2D* d, B w, B x) { 
+  dec(dbg_handler);
+  dbg_handler=inc(d->g);
+  vm_onThrow=dbg_onThrow;
+  return c2(d->f,w,x);
 }
 
 //TODO breakpoint
@@ -40,10 +42,9 @@ STATIC_GLOBAL B debuggerNS;
 B getDebuggerNS(void) {
   if (debuggerNS.u == 0) {
     gc_add_ref(&dbg_handler);
-    gc_add_ref(&dbg_x);
     #define F(X) incG(bi_##X),
-    Body* d    = m_nnsDesc("readline", "bqn", "onpause");
-    debuggerNS = m_nns(d, F(readline)F(dbqn)F(onpause));
+    Body* d    = m_nnsDesc("readline", "bqn", "trap");
+    debuggerNS = m_nns(d, F(readline)F(dbqn)F(trap));
     #undef F
     gc_add(debuggerNS);
   }
