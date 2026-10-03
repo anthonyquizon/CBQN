@@ -37,13 +37,6 @@ B framebqn_c2(B t, B w, B x) {
   Scope* sc = m_scope(initBlock->bodies[0], dbg_envTop->sc, 0, 0, NULL);
   ptr_dec(initBlock);
 
-  if(CATCH) {
-    /*fprintf(stderr, "Error: "); printErrMsg(stderr, thrownMsg); fprintf(stderr, "\n");*/
-    /*vm_pst(stderr, envCurr+1, envStart+envPrevHeight);*/
-    ptr_dec(sc);
-    rethrow();
-  }
-
   Block* block = bqn_comp(x, defaultUnknownState(), def_re, sc, COMP_UNK, false, true);
   ptr_dec(sc->body);
   sc->body = ptr_inc(block->bodies[0]);
