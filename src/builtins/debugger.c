@@ -37,14 +37,21 @@ B framebqn_c2(B t, B w, B x) {
   Scope* sc = m_scope(initBlock->bodies[0], dbg_envTop->sc, 0, 0, NULL);
   ptr_dec(initBlock);
 
+  if(CATCH) {
+    /*fprintf(stderr, "Error: "); printErrMsg(stderr, thrownMsg); fprintf(stderr, "\n");*/
+    /*vm_pst(stderr, envCurr+1, envStart+envPrevHeight);*/
+    ptr_dec(sc);
+    rethrow();
+  }
+
   Block* block = bqn_comp(x, defaultUnknownState(), def_re, sc, COMP_UNK, false, true);
   ptr_dec(sc->body);
   sc->body = ptr_inc(block->bodies[0]);
-  B res = execBlockInplace(block, sc);
+  B r = execBlockInplace(block, sc);
   ptr_dec(block);
   ptr_dec(sc);
 
-  return res;
+  return r;
 }
 
 // defaults to top most frame
@@ -85,3 +92,13 @@ B getDebuggerNS(void) {
   }
   return incG(debuggerNS);
 }
+
+/*B makeDebug_c1(Md1D* t, B x) {*/
+  /*if (!isArr(x)) thrM("•_makeDebug 𝕩: Argument must be an array");*/
+  /*if (rand_ns==NULL) rand_init();*/
+  /*B r = m_nns(rand_ns, r_uB(x.u>>32), r_uB(x.u&0xFFFFFFFF), m_nfn(rand_rangeDesc, bi_N), m_nfn(rand_dealDesc, bi_N), m_nfn(rand_subsetDesc, bi_N));*/
+  /*Scope* sc = c(NS,r)->sc;*/
+  /*for (i32 i = 2; i < 5; i++) nfn_swapObj(sc->vars[i], incG(r));*/
+  /*return r;*/
+/*}*/
+

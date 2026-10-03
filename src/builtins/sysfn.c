@@ -718,6 +718,7 @@ B currentError_c1(B t, B x) {
 B currentError_c1(B t, B x) { thrM("•CurrentError 𝕩: No errors as error catching has been disabled"); }
 #endif
 
+
 STATIC_GLOBAL Body* hashmap_ns;
 DEFINE_NFN hashmap_getDesc, hashmap_hasDesc, hashmap_setDesc, hashmap_deleteDesc, hashmap_countDesc, hashmap_keysDesc, hashmap_valuesDesc;
 // Hash object handling defined in search.c
