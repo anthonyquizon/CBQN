@@ -29,6 +29,8 @@
                   F(DFND0)F(DFND1)F(DFND2)F(FAIL)
 
 GLOBAL void (*vm_onThrow)(void) = NULL;
+GLOBAL bool cfg_keepVars = true; //TODO AQ delete
+/*GLOBAL bool cfg_keepVars = false;*/
 
 char* bc_repr(u32 p) {
   switch(p) { default: return "(unknown)";
@@ -108,7 +110,17 @@ B listVars(Scope* sc) {
     i32* varData = b->varData; usz bam = b->varAm;
     for (u64 i = 0; i < am0; i++) {
       i32 nameID = varData[i + bam];
-      r = vec_addN(r, incG(GetU(nameList, nameID)));
+      B name;
+      //TODO AQ: revist this 
+      if (nameID<0) {
+        char buf[32];
+        snprintf(buf, sizeof buf, "(slot %llu)", (unsigned long long)i);   // parentheses: not a valid BQN name
+        name = m_c8vec_0(buf);
+      }
+      else {
+        name=incG(GetU(nameList, nameID));
+      }
+      r = vec_addN(r, name);
     }
   }
   if (sc->ext) {
@@ -346,7 +358,7 @@ Block* compileBlock(B block, Comp* comp, bool* bDone, u32* bc, usz bcIA, B allBl
             break;
           }
           case VARO: case VARM: case VARU: {
-            i32 ins = c[0];
+            i32 ins = c[0]==VARU && cfg_keepVars ? VARO : c[0]; // disarm VARU for debugging
             i32 cdepth = c[1];
             i32 cpos = c[2];
             if (cdepth+1 > mpsc) mpsc = cdepth+1;

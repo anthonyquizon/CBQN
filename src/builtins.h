@@ -29,7 +29,7 @@
 /*  arithm.c*/M(cbrt,"•math.Cbrt") M(log2,"•math.Log2") M(log10,"•math.Log10") M(log1p,"•math.Log1p") M(expm1,"•math.Expm1") M(fact,"•math.Fact") M(logfact,"•math.LogFact") \
 /*  arithm.c*/M(erf,"•math.Erf") M(erfc,"•math.ErfC") M(sum,"•math.Sum") \
 /*     ffi.c*/M(foreignSizeof,"•foreign.Sizeof") A(foreignReadCharsTo0,"•foreign.ReadCharsTo0") A(foreignReadBytesTo0,"•foreign.ReadBytesTo0") \
-/*debugger.c*/M(readline,"•debug.ReadLine") M(dbqn,"•debug.BQN") 
+/*debugger.c*/M(readline,"•debug.ReadLine") A(framebqn,"•debug.FrameBQN") 
 
 #define FOR_PM1(A,M,D) \
 /*    md1.c*/A(tbl,"⌜") A(each,"¨") A(fold,"´") A(scan,"`") A(const,"˙") A(swap,"˜") A(cell,"˘") A(insert,"˝") \

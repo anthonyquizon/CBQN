@@ -89,6 +89,7 @@ typedef struct Scope Scope;
 typedef struct ScopeExt ScopeExt;
 
 extern GLOBAL void (*vm_onThrow)(void);
+extern GLOBAL bool cfg_keepVars;
 
 enum {
   COMP_UNK,
