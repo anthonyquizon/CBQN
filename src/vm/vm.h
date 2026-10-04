@@ -88,7 +88,7 @@ typedef struct Body Body;
 typedef struct Scope Scope;
 typedef struct ScopeExt ScopeExt;
 
-extern GLOBAL void (*vm_onThrow)(void);
+extern GLOBAL void (*vm_onThrow)(B msg);
 extern GLOBAL bool cfg_keepVars;
 
 enum {
