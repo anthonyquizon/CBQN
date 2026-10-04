@@ -1722,7 +1722,7 @@ INIT_GLOBAL u32* const dsv_text[] = {
   
   U"•rand.Deal",U"•rand.Range",U"•rand.Subset",
   U"•term.CharB",U"•term.CharN",U"•term.ErrRaw",U"•term.Flush",U"•term.OutRaw",U"•term.RawMode",
-  U"•debug.ReadLine",U"•debug.BQN",U"•debug._trap_",
+  U"•debug.ReadLine",U"•debug.BQN",
   NULL
 };
 

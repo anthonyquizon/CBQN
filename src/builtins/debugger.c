@@ -8,7 +8,7 @@
 const char* repl_readline(void); // from main.c
 STATIC_GLOBAL B dbg_handler;
 STATIC_GLOBAL bool dbg_inHandler=false;
-STATIC_GLOBAL Env* dbg_envTop; 
+STATIC_GLOBAL Env* dbg_envPause; 
 
 STATIC_GLOBAL Body* ctx_ns;
 DEFINE_NFN ctx_bqnDesc;
@@ -19,9 +19,20 @@ B ctx_bqn_c2(B t, B w, B x) {
 }
 
 B ctx_bqn_c1(B t, B x) {
+  if (!dbg_inHandler || !dbg_envPause) { 
+    thrM("context BQN executed outside of pause handler");
+  }
+
+  cfg_keepVars = true; 
   Block* initBlock = bqn_comp(m_c8vec_0("\"(Ctx BQN)\""), defaultUnknownState(), def_re, NULL, COMP_UNK, false, false);
-  Scope* sc = m_scope(initBlock->bodies[0], dbg_envTop->sc, 0, 0, NULL);
+  Scope* sc = m_scope(initBlock->bodies[0], dbg_envPause->sc, 0, 0, NULL);
   ptr_dec(initBlock);
+
+  if(CATCH) {
+    ptr_dec(sc);
+    cfg_keepVars = false; 
+    rethrow();
+  }
 
   Block* block = bqn_comp(x, defaultUnknownState(), def_re, sc, COMP_UNK, false, true);
   ptr_dec(sc->body);
@@ -29,29 +40,39 @@ B ctx_bqn_c1(B t, B x) {
   B r = execBlockInplace(block, sc);
   ptr_dec(block);
   ptr_dec(sc);
+  cfg_keepVars = false; 
 
   return r;
 }
 
 static NOINLINE void ctx_init() {
-  ctx_ns = m_nnsDesc("msg", "bqn");
+  /*ctx_ns = m_nnsDesc("msg","stack","bqn");*/
+  ctx_ns = m_nnsDesc("msg","bqn");
   ctx_bqnDesc = registerNFn(m_c8vec_0("(debug context).Bqn"), ctx_bqn_c1, ctx_bqn_c2);
 }
 
-static void dbg_onPause(B kind, B msg) {
+static void dbg_onPause(B msg) {
   if (q_N(dbg_handler) || dbg_inHandler || COMPS_ACTIVE()) { return; }
 
   inc(msg);
-  dbg_envTop=envCurr;
+  dbg_envPause=envCurr;
   dbg_inHandler=true;
 
   if (ctx_ns==NULL) ctx_init();
 
+  if(CATCH) {
+    dbg_envPause=NULL;
+    dbg_inHandler=false;
+    rethrow();
+  }
+
+  //TODO create frame stack
+  
   B ns = m_nns(ctx_ns, msg, m_nfn(ctx_bqnDesc, bi_N));
   B r=c1(dbg_handler, ns); 
   dec(msg);
   dec(r);
-  dbg_envTop=NULL;
+  dbg_envPause=NULL;
   dbg_inHandler=false;
 }
 

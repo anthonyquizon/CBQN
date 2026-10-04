@@ -29,8 +29,7 @@
                   F(DFND0)F(DFND1)F(DFND2)F(FAIL)
 
 GLOBAL void (*vm_onThrow)(B msg) = NULL;
-GLOBAL bool cfg_keepVars = true; //TODO AQ delete
-/*GLOBAL bool cfg_keepVars = false;*/
+GLOBAL bool cfg_keepVars = false;
 
 char* bc_repr(u32 p) {
   switch(p) { default: return "(unknown)";
@@ -1784,7 +1783,6 @@ NOINLINE NORETURN void throwImpl(bool rethrow) {
   run_pressure();
   
   if (!rethrow) envPrevHeight = envCurr-envStart + 1;
-  if (!rethrow && vm_onThrow) vm_onThrow(thrownMsg); 
 #if USE_SETJMP
   if (cf>cfStart) { // something wants to catch errors
     cf--;
@@ -1794,12 +1792,13 @@ NOINLINE NORETURN void throwImpl(bool rethrow) {
     while (gStack!=gStackNew) dec(*--gStack);
     unwindEnv(envStart + cf->envDepth - 1);
     
-    
     if (cfStart+cf->cfDepth > cf) fatal("bad catch cfDepth");
     cf = cfStart+cf->cfDepth;
     longjmp(cf->jmp, 1);
   } else { // uncaught error
 #endif
+    if (!rethrow && vm_onThrow) vm_onThrow(thrownMsg); 
+
     assert(cf==cfStart);
     fprintf(stderr, "Error: "); printErrMsg(stderr, thrownMsg); fprintf(stderr,"\n"); fflush(stderr);
     Env* envEnd = envStart+envPrevHeight;
