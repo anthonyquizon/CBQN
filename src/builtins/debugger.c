@@ -8,7 +8,7 @@
 const char* repl_readline(void); // from main.c
 STATIC_GLOBAL B dbg_handler;
 STATIC_GLOBAL bool dbg_inHandler=false;
-STATIC_GLOBAL Env* dbg_envTop; //TODO delete - use frame offset index instead
+STATIC_GLOBAL Env* dbg_envTop; 
 
 STATIC_GLOBAL Body* ctx_ns;
 DEFINE_NFN ctx_bqnDesc;
@@ -38,7 +38,7 @@ static NOINLINE void ctx_init() {
   ctx_bqnDesc = registerNFn(m_c8vec_0("(debug context).Bqn"), ctx_bqn_c1, ctx_bqn_c2);
 }
 
-static void dbg_onPause(B msg) {
+static void dbg_onPause(B kind, B msg) {
   if (q_N(dbg_handler) || dbg_inHandler || COMPS_ACTIVE()) { return; }
 
   inc(msg);
@@ -61,22 +61,6 @@ B readline_c1(B t, B x) {
   return ln? utf8Decode0(ln) : m_c32(0);
 }
 
-// 𝕨: frame number to use from stack
-/*B fbqn_c2(B t, B w, B x) {*/
-  /*Block* initBlock = bqn_comp(m_c8vec_0("\"(Debugger initializer)\""), defaultUnknownState(), def_re, NULL, COMP_UNK, false, false);*/
-  /*Scope* sc = m_scope(initBlock->bodies[0], dbg_envTop->sc, 0, 0, NULL);*/
-  /*ptr_dec(initBlock);*/
-
-  /*Block* block = bqn_comp(x, defaultUnknownState(), def_re, sc, COMP_UNK, false, true);*/
-  /*ptr_dec(sc->body);*/
-  /*sc->body = ptr_inc(block->bodies[0]);*/
-  /*B r = execBlockInplace(block, sc);*/
-  /*ptr_dec(block);*/
-  /*ptr_dec(sc);*/
-
-  /*return r;*/
-/*}*/
-
 B dbreak_c1(B t, B x) {
   dbg_onPause(m_c8vec_0("Breakpoint")); 
   return x;
@@ -97,8 +81,6 @@ B dbqn_c1(Md1D* d, B x) {
 
   return rebqn_exec(x, defaultUnknownState(), def_re);
 }
-
-//TODO add constructor that takes config and returns a namespace of functions a la •rand
 
 STATIC_GLOBAL B debuggerNS;
 B getDebuggerNS(void) {
