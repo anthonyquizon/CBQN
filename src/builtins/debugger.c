@@ -13,26 +13,21 @@ STATIC_GLOBAL Env* dbg_envPause;
 STATIC_GLOBAL Body* ctx_ns;
 DEFINE_NFN ctx_bqnDesc;
 
+//TODO create debug realm - re
+
 B ctx_bqn_c2(B t, B w, B x) {
-  //TODO run ctx.bqn with frame
-  return x;
-}
-
-B ctx_bqn_c1(B t, B x) {
   if (!dbg_inHandler || !dbg_envPause) { 
-    thrM("context BQN executed outside of pause handler");
+    thrM("(debug context).BQN: executed outside of pause handler");
   }
 
-  cfg_keepVars = true; 
+  u64 i = o2s(w);
+  u64 n = dbg_envPause-envStart + 1;
+  if (i>=n) thrM("(debug context).BQN: frame index out of range");
+  Env* e=dbg_envPause-i;
+
   Block* initBlock = bqn_comp(m_c8vec_0("\"(Ctx BQN)\""), defaultUnknownState(), def_re, NULL, COMP_UNK, false, false);
-  Scope* sc = m_scope(initBlock->bodies[0], dbg_envPause->sc, 0, 0, NULL);
+  Scope* sc = m_scope(initBlock->bodies[0], e->sc, 0, 0, NULL);
   ptr_dec(initBlock);
-
-  if(CATCH) {
-    ptr_dec(sc);
-    cfg_keepVars = false; 
-    rethrow();
-  }
 
   Block* block = bqn_comp(x, defaultUnknownState(), def_re, sc, COMP_UNK, false, true);
   ptr_dec(sc->body);
@@ -40,9 +35,12 @@ B ctx_bqn_c1(B t, B x) {
   B r = execBlockInplace(block, sc);
   ptr_dec(block);
   ptr_dec(sc);
-  cfg_keepVars = false; 
 
   return r;
+}
+
+B ctx_bqn_c1(B t, B x) {
+  return ctx_bqn_c2(t, m_f64(0), x);
 }
 
 static NOINLINE void ctx_init() {
@@ -66,14 +64,20 @@ static void dbg_onPause(B msg) {
     rethrow();
   }
 
+  /*i64 n = envCurr - envStart + 1;*/
+  /*M_HARR(r, n);*/
+
   //TODO create frame stack
   
   B ns = m_nns(ctx_ns, msg, m_nfn(ctx_bqnDesc, bi_N));
   B r=c1(dbg_handler, ns); 
   dec(msg);
   dec(r);
+
   dbg_envPause=NULL;
   dbg_inHandler=false;
+
+  popCatch(); 
 }
 
 B readline_c1(B t, B x) {
@@ -96,11 +100,23 @@ B dbqn_c2(Md1D* d, B w, B x) {
 B dbqn_c1(Md1D* d, B x) { 
   vfyStr(x, "•BQN", "𝕩");
 
+  /*
+   * 
+   */
+  cfg_keepVars = true; 
+  if(CATCH) {
+    cfg_keepVars=false;
+    vm_onThrow=NULL;
+    rethrow();
+  }
   dec(dbg_handler);
   dbg_handler=inc(d->f);
   vm_onThrow=dbg_onPause;
 
-  return rebqn_exec(x, defaultUnknownState(), def_re);
+  B r = rebqn_exec(x, defaultUnknownState(), def_re);
+  cfg_keepVars = false; 
+  popCatch(); 
+  return r;
 }
 
 STATIC_GLOBAL B debuggerNS;
