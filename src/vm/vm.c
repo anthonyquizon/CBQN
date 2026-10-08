@@ -357,7 +357,7 @@ Block* compileBlock(B block, Comp* comp, bool* bDone, u32* bc, usz bcIA, B allBl
             break;
           }
           case VARO: case VARM: case VARU: {
-            i32 ins = c[0]==VARU && cfg_keepVars ? VARO : c[0]; // disarm VARU for debugging
+            i32 ins = c[0]; 
             i32 cdepth = c[1];
             i32 cpos = c[2];
             if (cdepth+1 > mpsc) mpsc = cdepth+1;
@@ -1783,6 +1783,7 @@ NOINLINE NORETURN void throwImpl(bool rethrow) {
   run_pressure();
   
   if (!rethrow) envPrevHeight = envCurr-envStart + 1;
+  if (!rethrow && vm_onThrow) vm_onThrow(thrownMsg); 
 #if USE_SETJMP
   if (cf>cfStart) { // something wants to catch errors
     cf--;
@@ -1797,8 +1798,6 @@ NOINLINE NORETURN void throwImpl(bool rethrow) {
     longjmp(cf->jmp, 1);
   } else { // uncaught error
 #endif
-    if (!rethrow && vm_onThrow) vm_onThrow(thrownMsg); 
-
     assert(cf==cfStart);
     fprintf(stderr, "Error: "); printErrMsg(stderr, thrownMsg); fprintf(stderr,"\n"); fflush(stderr);
     Env* envEnd = envStart+envPrevHeight;
