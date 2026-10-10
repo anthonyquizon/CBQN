@@ -52,6 +52,7 @@ B ctx_bqn_c1(B t, B x) {
   return ctx_bqn_c2(t, m_f64(0), x);
 }
 
+#define BCPOS(B,P) (B->bl->map[(P)-(u32*)B->bl->bc])
 void dbg_onPause(B msg) {
   if (q_N(dbg_handler) || dbg_inHandler || COMPS_ACTIVE()) { return; }
 
@@ -70,17 +71,33 @@ void dbg_onPause(B msg) {
   // allocate buffer for temporary scopes to be lazily filled in ctx.bqn
   HArr_p rs = m_harrUv(n);
   for (usz i=0;i<n;i++) { rs.a[i]=bi_N; }
+  NOGC_E;
 
-  //TODO create frame stack
-  /*for (u32 i=0;i<n;i++) {*/
-    /*Env e* = dbg_envPause-i;*/
+  // create stack frame list
+  HArr_p rf = m_harr0v(n);
+  for (u32 i=0;i<n;i++) {
+    Env* e = dbg_envPause-i;
+    Comp* comp = e->sc->body->bl->comp;
+    i32 bcPos = e->pos&1? ((u32)e->pos)>>1 : BCPOS(e->sc->body, PTR_FROM_INT(u32, e->pos));
 
-    /*// src, file, start, end*/
-  /*}*/
+    B src = comp->src;
+    B path = q_N(comp->fullpath)? emptyCVec() : inc(comp->fullpath);
 
-  //TODO lazily create scope depending on frame
+    if (q_N(src) || q_N(comp->indices)) { 
+      printf("no source for frame: %d\n", i);
+      continue;
+    }
 
-  B ns = m_nns(ctx_ns, msg, bi_N, m_nfn(ctx_bqnDesc, rs.b));
+    B inds = IGetU(comp->indices, 0); B cs = m_usz(o2s(IGetU(inds,bcPos)));
+    B inde = IGetU(comp->indices, 1); B ce = m_usz(o2s(IGetU(inde,bcPos))+1);
+
+    inc(src);
+    inc(path);
+
+    rf.a[i]=m_hvec4(src,path,cs,ce); 
+  }
+
+  B ns = m_nns(ctx_ns, msg, rf.b, m_nfn(ctx_bqnDesc, rs.b));
   B r=c1(dbg_handler, ns); 
   dec(r);
 
@@ -91,7 +108,7 @@ void dbg_onPause(B msg) {
 }
 
 B dbreak_c1(B t, B x) {
-  B msg=m_c8vec_0("breakpoint");
+  B msg=m_c8vec_0("Breakpoint");
   dbg_onPause(msg); 
   dec(msg);
   return x;
