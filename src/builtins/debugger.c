@@ -8,22 +8,36 @@
 STATIC_GLOBAL B dbg_handler;
 STATIC_GLOBAL bool dbg_inHandler=false;
 STATIC_GLOBAL Env* dbg_envPause; 
+STATIC_GLOBAL Env* dbg_envBase; 
 
 STATIC_GLOBAL Body* ctx_ns;
 DEFINE_NFN ctx_bqnDesc;
 DEFINE_NFN dbg_compDesc;
 
 B ctx_bqn_c2(B t, B w, B x) {
-  if (!dbg_inHandler || !dbg_envPause) { 
+  if (!dbg_inHandler || !dbg_envPause || !dbg_envBase) { 
     thrM("(debug context).BQN: executed outside of pause handler");
   }
 
-  Scope* sc = c(Scope, nfn_objU(t));
+  B* o = harr_ptr(nfn_objU(t));
 
-  /*u64 i = o2s(w);*/
-  /*u64 n = dbg_envPause-envStart + 1;*/
-  /*if (i>=n) thrM("(debug context).BQN: frame index out of range");*/
-  /*Env* e=dbg_envPause-i;*/
+  u64 i = o2s(w);
+  u64 n = dbg_envPause-dbg_envBase + 1;
+  if (i>=n) thrM("(debug context).BQN: frame index out of range");
+
+  Scope* sc;
+
+  // Create temporary scope depending on frame
+  if (q_N(o[i])) {
+    Env* e=dbg_envPause-i;
+    Block* initBlock = bqn_comp(m_c8vec_0("\"(REPL initializer)\""), defaultUnknownState(), def_re, NULL, COMP_UNK, false, false);
+    sc = m_scope(initBlock->bodies[0], e->sc, 0, 0, NULL);
+    o[i] = tag(sc, OBJ_TAG);
+    ptr_dec(initBlock);
+  }
+  else {
+    sc = c(Scope, o[i]);
+  }
 
   Block* block = bqn_comp(x, defaultUnknownState(), def_re, sc, COMP_UNK, false, true);
   ptr_dec(sc->body);
@@ -52,14 +66,21 @@ void dbg_onPause(B msg) {
     rethrow();
   }
 
+  u64 n = dbg_envPause-dbg_envBase + 1;
+  // allocate buffer for temporary scopes to be lazily filled in ctx.bqn
+  HArr_p rs = m_harrUv(n);
+  for (usz i=0;i<n;i++) { rs.a[i]=bi_N; }
+
   //TODO create frame stack
+  /*for (u32 i=0;i<n;i++) {*/
+    /*Env e* = dbg_envPause-i;*/
 
-  Block* initBlock = bqn_comp(m_c8vec_0("\"(REPL initializer)\""), defaultUnknownState(), def_re, NULL, COMP_UNK, false, false);
-  Scope* sc = m_scope(initBlock->bodies[0], dbg_envPause->sc, 0, 0, NULL);
-  B scVal = tag(sc,OBJ_TAG);
-  ptr_dec(initBlock);
+    /*// src, file, start, end*/
+  /*}*/
 
-  B ns = m_nns(ctx_ns, msg, m_nfn(ctx_bqnDesc, scVal));
+  //TODO lazily create scope depending on frame
+
+  B ns = m_nns(ctx_ns, msg, bi_N, m_nfn(ctx_bqnDesc, rs.b));
   B r=c1(dbg_handler, ns); 
   dec(r);
 
@@ -82,6 +103,7 @@ B dbg_comp_c2(B t, B w, B x) {
   I32Arr* bc = (I32Arr*)cpyI32Arr(rh->a[0]);  // fresh i32 copy of the bytecode; consumes the old element
   rh->a[0] = taga(bc);                        // slot now owns the new array
                                               
+  //TODO explain
   u32* p = (u32*)bc->a;
   u32* e = p + PIA(bc);
   for (; p<e; p = nextBC(p)) if (*p==VARU) *p = VARO;
@@ -103,6 +125,7 @@ B dbqn_c1(Md1D* d, B x) {
   }
 
   dbg_handler = d->f;
+  dbg_envBase=envCurr; // mark the start env that we want to debug from
   inc(dbg_handler);
 
   if (CATCH) {
@@ -132,7 +155,7 @@ B getDebuggerNS(void) {
     gc_add_ref(&dbg_handler);
 
     ctx_bqnDesc = registerNFn(m_c8vec_0("(debug context).Bqn"), ctx_bqn_c1, ctx_bqn_c2);
-    ctx_ns = m_nnsDesc("msg","bqn");
+    ctx_ns = m_nnsDesc("msg","frames","bqn");
     dbg_compDesc = registerNFn(m_c8vec_0("(debug compiler transform)"), c1_bad, dbg_comp_c2);
 
     #define F(X) incG(bi_##X),
