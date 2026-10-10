@@ -4,7 +4,6 @@ esc←@+27
 SetFrame←{ctx𝕊f:
   ⟨src, file,s,e⟩←f⊑ctx.frames
 
-  # TODO lines
   •Out file
   l←+´s↑src=@+10 # line number
   n←≠p←src⊔˜+`»src=@+10 
@@ -29,7 +28,7 @@ v←5 # size of src window
       @: •Out "Continue" ⋄ 0
     ; ")up"  : ctx SetFrame f↩(1+f)⌊≠ctx.frames⋄ 1
     ; ")down"  : ctx SetFrame f↩(1+f)⌈0⋄ 1
-    ; 𝕩: •Show∘ctx.BQN⎊{𝕊:•Out∘•CurrentError@}𝕩 ⋄ 1
+    ; 𝕩: {•Show f ctx.BQN 𝕩}⎊{𝕊:•Out∘•CurrentError@}𝕩 ⋄ 1
     } •Readline@ # TODO trim?
   } •_while_ ⊢ 1
 } •debug._BQN "

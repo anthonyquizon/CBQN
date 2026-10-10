@@ -30,7 +30,7 @@ B ctx_bqn_c2(B t, B w, B x) {
   // Create temporary scope depending on frame
   if (q_N(o[i])) {
     Env* e=dbg_envPause-i;
-    Block* initBlock = bqn_comp(m_c8vec_0("\"(REPL initializer)\""), defaultUnknownState(), def_re, NULL, COMP_UNK, false, false);
+    Block* initBlock = bqn_comp(m_c8vec_0("\"(REPL scratch)\""), defaultUnknownState(), def_re, NULL, COMP_UNK, false, false);
     sc = m_scope(initBlock->bodies[0], e->sc, 0, 0, NULL);
     o[i] = tag(sc, OBJ_TAG);
     ptr_dec(initBlock);
