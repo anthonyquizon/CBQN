@@ -3,7 +3,7 @@
 
   {𝕊:
     {
-      @: 0
+      @: •Out "Continue" ⋄ 0
     ; 𝕩: •Show∘ctx.BQN⎊{𝕊:•Out∘•CurrentError@}𝕩 ⋄ 1
     } •Readline@
   } •_while_ ⊢ 1

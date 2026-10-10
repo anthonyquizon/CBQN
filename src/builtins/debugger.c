@@ -48,6 +48,7 @@ void dbg_onPause(B msg) {
   if(CATCH) {
     dbg_envPause=NULL;
     dbg_inHandler=false;
+    dec(msg);
     rethrow();
   }
 
@@ -61,7 +62,6 @@ void dbg_onPause(B msg) {
   B ns = m_nns(ctx_ns, msg, m_nfn(ctx_bqnDesc, scVal));
   B r=c1(dbg_handler, ns); 
   dec(r);
-  ptr_dec(sc);
 
   dbg_envPause=NULL;
   dbg_inHandler=false;
@@ -70,7 +70,9 @@ void dbg_onPause(B msg) {
 }
 
 B dbreak_c1(B t, B x) {
-  dbg_onPause(m_c8vec_0("breakpoint")); 
+  B msg=m_c8vec_0("breakpoint");
+  dbg_onPause(msg); 
+  dec(msg);
   return x;
 }
 
