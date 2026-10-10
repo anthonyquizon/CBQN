@@ -1397,6 +1397,15 @@ B getNsNS(void) {
   return incG(nsNS);
 }
 
+extern void dbreak_c1(B t, B x); // defined in debugger.c
+extern const char* repl_readline(void); // from main.c
+
+B readline_c1(B t, B x) {
+  dec(x);
+  const char* ln = repl_readline();
+  return ln? utf8Decode0(ln) : m_c32(0);
+}
+
 B getInternalNS(void);
 B getDebuggerNS(void);
 B getMathNS(void);
@@ -1445,6 +1454,8 @@ STATIC_GLOBAL Body* file_nsGen;
   F(1, "toutf8", U"•ToUTF8", toUtf8) \
   F(1, "currenterror", U"•CurrentError", currentError) \
   F(1, "hashmap", U"•HashMap", hashMap) \
+  F(1, "readline", U"•Readline", readline) \
+  F(1, "break", U"•Break", dbreak) \
   OPTIONAL_VAL(DEBUG)(F(0, "testsysval2", U"•TestSysval2", testsysval2)) // end of FOR_CONSTANT_SYSVALS
 
 #define FOR_COMPUTED_SYSVALS(F) \

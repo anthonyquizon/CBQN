@@ -5,8 +5,6 @@
 #include "utils/nfns.h"
 #include "builtins.h"
 
-const char* repl_readline(void); // from main.c
-
 STATIC_GLOBAL B dbg_handler;
 STATIC_GLOBAL bool dbg_inHandler=false;
 STATIC_GLOBAL Env* dbg_envPause; 
@@ -40,7 +38,7 @@ B ctx_bqn_c1(B t, B x) {
   return ctx_bqn_c2(t, m_f64(0), x);
 }
 
-static void dbg_onPause(B msg) {
+void dbg_onPause(B msg) {
   if (q_N(dbg_handler) || dbg_inHandler || COMPS_ACTIVE()) { return; }
 
   inc(msg);
@@ -50,7 +48,6 @@ static void dbg_onPause(B msg) {
   if(CATCH) {
     dbg_envPause=NULL;
     dbg_inHandler=false;
-    dec(msg);
     rethrow();
   }
 
@@ -63,7 +60,6 @@ static void dbg_onPause(B msg) {
 
   B ns = m_nns(ctx_ns, msg, m_nfn(ctx_bqnDesc, scVal));
   B r=c1(dbg_handler, ns); 
-  /*dec(msg);*/
   dec(r);
   ptr_dec(sc);
 
@@ -73,14 +69,8 @@ static void dbg_onPause(B msg) {
   popCatch(); 
 }
 
-B readline_c1(B t, B x) {
-  dec(x);
-  const char* ln = repl_readline();
-  return ln? utf8Decode0(ln) : m_c32(0);
-}
-
 B dbreak_c1(B t, B x) {
-  dbg_onPause(m_c8vec_0("Breakpoint")); 
+  dbg_onPause(m_c8vec_0("breakpoint")); 
   return x;
 }
 
@@ -144,8 +134,8 @@ B getDebuggerNS(void) {
     dbg_compDesc = registerNFn(m_c8vec_0("(debug compiler transform)"), c1_bad, dbg_comp_c2);
 
     #define F(X) incG(bi_##X),
-    Body* d    = m_nnsDesc("readline", "bqn", "break");
-    debuggerNS = m_nns(d, F(readline)F(dbqn)F(dbreak));
+    Body* d    = m_nnsDesc("bqn");
+    debuggerNS = m_nns(d, F(dbqn));
     #undef F
     gc_add(debuggerNS);
   }
