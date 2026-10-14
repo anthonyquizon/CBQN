@@ -1,8 +1,10 @@
 #!/usr/bin/env bqn
 esc←@+27
 
+•Out "Running "∾⊑•args
+
 SetFrame←{ctx𝕊f:
-  ⟨src, file,s,e⟩←f⊑ctx.frames
+  ⟨src,file,s,e⟩←f⊑ctx.frames
 
   •Out file
   l←+´s↑src=@+10 # line number
@@ -19,6 +21,7 @@ SetFrame←{ctx𝕊f:
   •Out fr
 }
 
+
 v←5 # size of src window
 {𝕊 ctx:
   f←0 # frame index in stack
@@ -31,16 +34,4 @@ v←5 # size of src window
     ; 𝕩: {•Show f ctx.BQN 𝕩}⎊{𝕊:•Out∘•CurrentError@}𝕩 ⋄ 1
     } •Readline@ # TODO trim?
   } •_while_ ⊢ 1
-} •debug._BQN "
-  a←↕b←10
-
-  r←2+2
-  q←1+1
-  F←{𝕊:
-    a←2222
-    •Break@
-  }
-
-  F@
-  #99⊏a
-"
+} •debug._BQN "•Import """ ∾ (⊑•args) ∾ """"
