@@ -1,0 +1,5 @@
+#!/bin/sh
+# execute cbqn relative  
+dir=$(dirname "$(readlink -f "$0")")
+exec "$dir/../bqn" "$dir/dbg.bqn" "$@"
+

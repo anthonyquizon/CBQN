@@ -1,4 +1,4 @@
-
+#!/usr/bin/env bqn
 esc←@+27
 
 SetFrame←{ctx𝕊f:
