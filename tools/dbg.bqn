@@ -24,8 +24,8 @@ List←{ctx𝕊f:
   loop
 }
 
-Exit    ←{𝕊: •Out "Exit" ⋄ •Exit 0 }
-Continue←{𝕊:•Out "Continue" ⋄ cont}
+Exit    ←{  𝕊  :•Out "Exit" ⋄ •Exit 0 }
+Continue←{  𝕊  :•Out "Continue" ⋄ cont}
 Step    ←{· 𝕊 ·:•Out "TODO: Step" ⋄ loop}
 
 {𝕊 ctx:
@@ -33,8 +33,8 @@ Step    ←{· 𝕊 ·:•Out "TODO: Step" ⋄ loop}
   {𝕊:
     {
       @: Exit @
-    ; ")up": ctx List i↩(1+i)⌊≠ctx.frames⋄ 1
-    ; ")down": ctx List i↩(1+i)⌈0⋄ 1
+    ; ")up": ctx List i↩(i+1)⌊¯1+≠ctx.frames ⋄ loop
+    ; ")down": ctx List i↩(i-1)⌈0 ⋄ loop
     ; ")l": ctx List i
     ; ")list": ctx List i
     ; ")c": Continue @

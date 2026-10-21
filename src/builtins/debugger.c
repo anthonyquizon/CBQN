@@ -22,7 +22,8 @@ B ctx_bqn_c2(B t, B w, B x) {
   B* o = harr_ptr(nfn_objU(t));
 
   u64 i = o2s(w);
-  u64 n = dbg_envPause-dbg_envBase + 1;
+  u64 n = dbg_envPause-dbg_envBase;
+
   if (i>=n) thrM("(debug context).BQN: frame index out of range");
 
   Scope* sc;
@@ -67,7 +68,7 @@ void dbg_onPause(B msg) {
     rethrow();
   }
 
-  u64 n = dbg_envPause-dbg_envBase + 1;
+  u64 n = dbg_envPause-dbg_envBase;
   // allocate buffer for temporary scopes to be lazily filled in ctx.bqn
   HArr_p rs = m_harrUv(n);
   for (usz i=0;i<n;i++) { rs.a[i]=bi_N; }
@@ -137,7 +138,7 @@ B dbqn_c2(Md1D* d, B w, B x) {
 B dbqn_c1(Md1D* d, B x) { 
   vfyStr(x, "•debug.BQN", "𝕩");
 
-  if (q_N(dbg_handler) || dbg_inHandler || COMPS_ACTIVE()) { 
+  if (!q_N(dbg_handler) || dbg_inHandler || COMPS_ACTIVE()) { 
     thrM("debug.BQN: nested debug calls");
   }
 
@@ -171,6 +172,7 @@ B getDebuggerNS(void) {
   if (debuggerNS.u == 0) {
     gc_add_ref(&dbg_handler);
 
+    dbg_handler=bi_N;
     ctx_bqnDesc = registerNFn(m_c8vec_0("(debug context).Bqn"), ctx_bqn_c1, ctx_bqn_c2);
     ctx_ns = m_nnsDesc("msg","frames","bqn");
     dbg_compDesc = registerNFn(m_c8vec_0("(debug compiler transform)"), c1_bad, dbg_comp_c2);
