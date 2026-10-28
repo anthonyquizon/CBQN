@@ -5,7 +5,6 @@ cont‿loop←↕2
 
 •Out "Running "∾⊑•args
 
-
 ListN←{n𝕊⟨src,file,s,e⟩:
   l←+´s↑nl←src=@+10 ⋄ g←⊔+`»nl                            # mark new lines, get target line number. group indices by lines
   w←g⊏˜i←(0⌈l-n-1)↓↕(≠g)⌊l+n                              # line window ie. n-2 n-1 n n+1 n+2
