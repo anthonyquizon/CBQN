@@ -110,7 +110,6 @@ B listVars(Scope* sc) {
     for (u64 i = 0; i < am0; i++) {
       i32 nameID = varData[i + bam];
       B name;
-      //TODO AQ: revist this 
       if (nameID<0) {
         char buf[32];
         snprintf(buf, sizeof buf, "(slot %llu)", (unsigned long long)i);   // parentheses: not a valid BQN name
