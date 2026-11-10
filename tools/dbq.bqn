@@ -21,7 +21,7 @@ List←{ctx𝕊f:
 
 Frames←{ctx𝕊i:
   f←¯1↓2⊸ListN¨ctx.frames                                 # file‿src frame listing without top level import
-  •Out¨¨(⋈¨"Frame #"⊸∾¨3↑•Fmt¨↕≠f)∾¨f
+  •Out¨¨(⋈¨"Frame #"⊸∾¨3↑¨•Fmt¨↕≠f)∾¨f
   loop
 }
 
