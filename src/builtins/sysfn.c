@@ -673,7 +673,14 @@ B getRandNS(void) {
   }
   return incG(randNS);
 }
-DEFINE_NFN bqnDesc, rebqnDesc, rebqnResDesc;
+
+DEFINE_NFN bqnDesc, rebqnDesc, rebqnResDesc, postcompWDesc;
+B postcompW_c2(B t, B w, B x) {
+  dec(w);
+  B p = COMPS_CREF(path);
+  B n = COMPS_CREF(name);
+  return m_hvec3(x, q_N(p) ? emptyCVec(): inc(p), q_N(n) ? emptyCVec(): inc(n));
+}
 B rebqn_c1(B t, B x) {
   if (!isNsp(x)) thrM("•ReBQN 𝕩: Argument must be a namespace");
   B repl = ns_getC(x, "repl");
@@ -700,8 +707,8 @@ B rebqn_c1(B t, B x) {
   init_comp(d.a, harr_ptr(ref[0]), prim, sys, remap);
 
   if (!q_N(post)) {
-      if (!isFun(post)) thrM("•ReBQN 𝕩: postcompile must be a function");
-      d.a[re_compFn] = m_fork(incG(bi_rtack), inc(post), d.a[re_compFn]);
+      if (!isFun(post)) thrM("•ReBQN 𝕩: postcomp must be a function");
+      d.a[re_compFn] = m_fork(m_nfn(postcompWDesc, bi_N), inc(post), d.a[re_compFn]);
   }
 
   decG(x);
@@ -1758,6 +1765,7 @@ void sysfn_init(void) {
   bqnDesc   = registerNFn(m_c32vec_0(U"•BQN"), bqn_c1, bqn_c2);
   rebqnDesc = registerNFn(m_c32vec_0(U"•ReBQN"), rebqn_c1, c2_bad);
   rebqnResDesc = registerNFn(m_c8vec_0("(REPL)"), repl_c1, repl_c2);
+  postcompWDesc = registerNFn(m_c8vec_0("(postcomp)"), c1_bad, postcompW_c2);
 }
 void sysfnPost_init(void) {
   c(BMd1,bi_bitcast)->im = bitcast_im;
