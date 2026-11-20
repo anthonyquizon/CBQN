@@ -687,7 +687,7 @@ B rebqn_c1(B t, B x) {
   B prim = ns_getC(x, "primitives");
   B sys = ns_getC(x, "system");
   B remap = ns_getC(x, "remap");
-  B post = ns_getC(x, "postcomp");
+  B post = ns_getC(x, "postcompile");
   i32 replVal = q_N(repl) || eqStr(repl,U"none")? 0 : eqStr(repl,U"strict")? 1 : eqStr(repl,U"loose")? 2 : 3;
   if (replVal==3) thrM("•ReBQN 𝕩: Invalid repl value");
   B scVal;
@@ -707,7 +707,7 @@ B rebqn_c1(B t, B x) {
   init_comp(d.a, harr_ptr(ref[0]), prim, sys, remap);
 
   if (!q_N(post)) {
-      if (!isFun(post)) thrM("•ReBQN 𝕩: postcomp must be a function");
+      if (!isFun(post)) thrM("•ReBQN 𝕩: postcompile must be a function");
       d.a[re_compFn] = m_fork(m_nfn(postcompWDesc, bi_N), inc(post), d.a[re_compFn]);
   }
 

@@ -1,5 +1,5 @@
 #! /usr/bin/env bqn
-e←@+27 ⋄ fr←1÷30 ⋄ nl←@+10                                        # fr: frames per second
+e←@+27 ⋄ fr←1÷30 ⋄ nl←@+10                                                  # fr: frames per second
 TermSize←{𝕊:
   t←¯1↓1⊑•SH⟨"sh","-c","stty size </dev/tty"⟩
   •BQN '‿'¨⌾((' '=t)⊸/)t
@@ -7,27 +7,27 @@ TermSize←{𝕊:
 
 
 blocks←{
-  all   ⇐ @+9600+↕32                                              # "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟"
-  lower ⇐ @+9600+1+↕8                                             # "▁▂▃▄▅▆▇█"  ⅛ → full height (bars, sparklines)
-  left  ⇐ @+9608+↕8                                               # "█▉▊▋▌▍▎▏"  full → ⅛ width (horizontal bars)
-  shade ⇐ " ░▒▓█"                                                 # empty → full shading
-  quads ⇐ " ▘▝▀▖▌▞▛▗▚▐▜▄▙▟█"                                      # quadrants indexed by 4-bit mask (TL=1 TR=2 BL=4 BR=8)
+  all   ⇐ @+9600+↕32                                                        # "▀▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕▖▗▘▙▚▛▜▝▞▟"
+  lower ⇐ @+9600+1+↕8                                                       # "▁▂▃▄▅▆▇█"  ⅛ → full height (bars, sparklines)
+  left  ⇐ @+9608+↕8                                                         # "█▉▊▋▌▍▎▏"  full → ⅛ width (horizontal bars)
+  shade ⇐ " ░▒▓█"                                                           # empty → full shading
+  quads ⇐ " ▘▝▀▖▌▞▛▗▚▐▜▄▙▟█"                                                # quadrants indexed by 4-bit mask (TL=1 TR=2 BL=4 BR=8)
 
   # Quadrant char from booleans tl‿tr‿bl‿br
   Quad ⇐ { quads⊑˜+´1‿2‿4‿8×𝕩 }
 
   # ANSI SGR escapes
   e     ⇐ @+27
-  Sgr   ⇐ { e∾"["∾(1↓∾";"⊸∾¨•Fmt¨𝕩)∾"m" }                         # Sgr ⟨codes…⟩
-  Fg    ⇐ Sgr 38‿2∾⊢                                              # truecolor foreground: Fg r‿g‿b
-  Bg    ⇐ Sgr 48‿2∾⊢                                              # truecolor background: Bg r‿g‿b
-  Fg256 ⇐ Sgr 38‿5∾⊢                                              # 256-colour fg: 232–255 grey ramp, 16–231 6×6×6 cube
+  Sgr   ⇐ { e∾"["∾(1↓∾";"⊸∾¨•Fmt¨𝕩)∾"m" }                                   # Sgr ⟨codes…⟩
+  Fg    ⇐ Sgr 38‿2∾⊢                                                        # truecolor foreground: Fg r‿g‿b
+  Bg    ⇐ Sgr 48‿2∾⊢                                                        # truecolor background: Bg r‿g‿b
+  Fg256 ⇐ Sgr 38‿5∾⊢                                                        # 256-colour fg: 232–255 grey ramp, 16–231 6×6×6 cube
   Bg256 ⇐ Sgr 48‿5∾⊢
-  rs    ⇐ Sgr ⟨0⟩                                                 # reset
-  Half ⇐ { (Fg 𝕨)∾(Bg 𝕩)∾"▀" }                                    # Two vertical pixels in one cell: top Half bot (both r‿g‿b)
-  Hue ⇐ { ⌊255×0⌈1⌊1-˜|3-˜6|0‿4‿2+6×𝕩 }                           # Hue in [0,1) → r‿g‿b (full saturation and value)
-  Gradient ⇐ { a‿b𝕊n: rs∾˜{(Fg ⌊a+𝕩×b-a)∾"█"}¨(↕n)÷1⌈n-1 }       # a‿b Gradient n: n full blocks linearly interpolated from colour a to b
-  Spectrum ⇐ { rs∾˜∾{(Hue 𝕩)Half Hue 1|𝕩+0.5}¨(↕𝕩)÷𝕩 }            # Spectrum n: rainbow of n half-block cells (hue on top, shifted hue below)
+  rs    ⇐ Sgr ⟨0⟩                                                           # reset
+  Half ⇐ { (Fg 𝕨)∾(Bg 𝕩)∾"▀" }                                              # Two vertical pixels in one cell: top Half bot (both r‿g‿b)
+  Hue ⇐ { ⌊255×0⌈1⌊1-˜|3-˜6|0‿4‿2+6×𝕩 }                                     # Hue in [0,1) → r‿g‿b (full saturation and value)
+  Gradient ⇐ { a‿b𝕊n: rs∾˜{(Fg ⌊a+𝕩×b-a)∾"█"}¨(↕n)÷1⌈n-1 }                  # a‿b Gradient n: n full blocks linearly interpolated from colour a to b
+  Spectrum ⇐ { rs∾˜∾{(Hue 𝕩)Half Hue 1|𝕩+0.5}¨(↕𝕩)÷𝕩 }                      # Spectrum n: rainbow of n half-block cells (hue on top, shifted hue below)
 
   black     ⇐ 0‿0‿0
   white     ⇐ 255‿255‿255
@@ -56,6 +56,14 @@ blocks←{
 
   Cube ⇐ { 16++´36‿6‿1×𝕩 }
 }
+
+#ops
+push←0  ⋄ dfnd←1  ⋄ sysv←2  ⋄ pops←6  ⋄ retn←7  ⋄ retd←8  ⋄ lsto←11 ⋄ lstm←12
+armo←13 ⋄ armm←14 ⋄ fn1c←16 ⋄ fn2c←17 ⋄ fn1o←18 ⋄ fn2o←19 ⋄ tr2d←20 ⋄ tr3d←21
+chkv←22 ⋄ tr3o←23 ⋄ md1c←26 ⋄ md2c←27 ⋄ md2l←28 ⋄ md2r←29 ⋄
+varo←32 ⋄ varm←33 ⋄ varu←34 ⋄ dyno←38 ⋄ dynm←39 ⋄ pred←42 ⋄ vfym←43
+notm←44 ⋄ seth←47 ⋄ setn←48 ⋄ setu←49 ⋄ setm←50 ⋄ setc←51 ⋄ fldo←64
+fldm←65 ⋄ alim←66
 
 #Write ⇐ {𝕊:
   # TODO write, remove old, rename to new
@@ -117,35 +125,74 @@ Input⇐{
 #}•args
 
 # visualizers
+Write←{
+  •SHOW 𝕨
+  𝕩
+}
 
-Postcomp←{
-  b‿const‿blk‿bdy‿(i‿e)‿tok ← 𝕩
-  •SHOW¨𝕨
-  ba‿bc‿bo‿bp ← (⊏/¨1⊸↓)'0'-˜⟨ # For each instruction, number of:
-    "11411311121111111315114131131111=111"  # Codes until next opcode
-    "111000111100000000002221100000000111"  # Arguments
-    "000111////23232303230000011022232111"  # Stack values consumed
-    "111000111111111101111111101101111111"  # Stack values output
-    "000000000011111101010000000000010000"  # Position determiner
+Fn←{𝕊:
+  •SHOW 𝕩
+  •SHOW "wooo!"
+  𝕩
+}
+
+Insert←{p‿in𝕊b‿inds‿s:
+  •SHOW 0¨b
+  𝕩
+}
+
+Postcompile←{
+  bc‿const‿blk‿bdy‿(s‿e)‿tok ← 𝕩
+  ba‿·‿·‿· ← (⊏/¨1⊸↓)'0'-˜⟨                                                 # For each instruction, number of:
+    "11411311121111111315114131131111=111"                                  # Codes until next opcode
+    "111000111100000000002221100000000111"                                  # Arguments
+    "000111////23232303230000011022232111"                                  # Stack values consumed
+    "111000111111111101111111101101111111"                                  # Stack values output
+    "000000000011111101010000000000010000"                                  # Position determiner
   ⟩
-  m ← { # Mask of instruction starts
-    n ← (↕≠b)+1+ba(⊣⊏˜≠⊸>×⊢)b
+  m←{                                                                       # Mask of instruction starts
     Se←≠(>/⊢)∾⟜≠{(⊏˜𝕨)𝕊⍟(≠○(¯1⊸⊑))𝕩∾𝕩⊏𝕨}⟨0⟩˙
-    (≠↑·/⁼Se) n
+    (≠↑·/⁼Se) (↕≠bc)+1+ba(⊣⊏˜≠⊸>×⊢)bc
   }
 
-  # Patch Show
-  # 
-  𝕩
+  # Patch all assignments and sets
 
-  # 
+  #•SHOW [b,m, m∧⟨varm⟩∊˜b, m∧⟨setn,setu⟩∊˜b]
+  # starts bdy indices ⊑¨bdy
+  starts←⊑¨bdy
+  n←⊑const⊐@
+
+  # NOTE pop is reversed 
+  p←/m∧bc∊setn‿setu # offset by setn and setu args
+
+  # TODO find position and shift by arg numbers
+  # fn1c takes current top as input and should return the same as output like •SHOW  
+  in←⟨push, ≠const, fn1c⟩¨p                         # build insertion inclusive of current opcode and args
+  
+  {
+    c←1+(≠¨in)⌾(p⊸⊏) 0¨bc                                                     # expand values eg 1 1 1 1 5 1 1
+    o←(+`c)-c                                                               # offset positions of every old word
+    m←∧⟜»c/1≠c
+    bc↩(∾in)⌾((/m)⊸⊏) c/bc
+    bdy↩(⊑⟜o)⌾⊑¨bdy
+    s‿e↩c⊸/¨s‿e
+
+    # TODO fix tok
+  }
+  
+  ⟨bc, const∾⟨fn⟩, blk, bdy, s‿e, tok⟩
 }
 
 
-re←•ReBQN {Postcomp⇐Postcomp}
+re←•ReBQN {Postcompile⇐Postcompile}
 
 •state Re "
-  •Import ""test.bqn""
-  •SHOW 'a'+↕5
-  1+1
+  #•Import ""test.bqn""
+  a←1
+  #•Show @
+  #a↩2
+  #1+1
 "
+
+•SHOW "done"
+
